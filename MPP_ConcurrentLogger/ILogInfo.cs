@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace MPP_ConcurrentLogger
 {
-    public interface ILoggerTarget
+    public interface ILogInfo
     {
-        bool Flush(LogInfo[] logsInfo);
-        Task<bool> FlushAsync(LogInfo[] logsInfo);
+        LogLevel Level { get; }
+        string Message { get; }
+        DateTime Time { get; }
     }
 }
