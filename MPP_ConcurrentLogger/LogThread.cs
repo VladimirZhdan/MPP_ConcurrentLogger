@@ -24,9 +24,11 @@ namespace MPP_ConcurrentLogger
         {
             for (int i = 0; i < countMessage; i++)
             {
-                string message = "task" + i + " thread №" + Thread.CurrentThread.ManagedThreadId;
-                logger.Log(level, message);
-                Thread.Sleep(500);
+                string startMessage = "task" + i + " thread №" + Thread.CurrentThread.ManagedThreadId + " start";
+                logger.Log(level, startMessage);
+                Thread.Sleep(1000);
+                string endMessage = "task" + i + " thread №" + Thread.CurrentThread.ManagedThreadId + " end";
+                logger.Log(level, endMessage);
             }
         }
     }

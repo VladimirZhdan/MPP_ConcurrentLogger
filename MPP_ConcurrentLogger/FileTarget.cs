@@ -27,10 +27,14 @@ namespace MPP_ConcurrentLogger
             }
             return true;
         }
-
+        
         public Task<bool> FlushAsync(LogInfo[] logsInfo)
-        {
-            throw new NotImplementedException();
+        {            
+            return Task.Run(() =>
+            {
+                return Flush(logsInfo);
+            });
+
         }
     }
 }

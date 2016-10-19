@@ -11,10 +11,10 @@ namespace MPP_ConcurrentLogger
     {        
         static void Main(string[] args)
         {
-            ILoggerTarget[] loggetTarger = new ILoggerTarget[1];
-            loggetTarger[0] = new FileTarget("data.txt");
-            Logger logger = new Logger(2, loggetTarger);
-            CreateAndStartThreads(50, 4, logger);            
+            ILoggerTarget[] loggerTarger = new ILoggerTarget[1];
+            loggerTarger[0] = new FileTarget("data.txt");
+            Logger logger = new Logger(2, loggerTarger);
+            CreateAndStartThreads(50, 2, logger);            
             Console.ReadLine();
         }
 

@@ -15,12 +15,14 @@ namespace MPP_ConcurrentLogger
         int currentLogsCount = 0;
         private ILoggerTarget[] targets;
         private LogInfo[] logsInfo;
+        private FlushLogsThreadPool flushLogsThreadPool;
 
         public Logger(int bufferLimit, ILoggerTarget[] targets)
         {
             this.bufferLimit = bufferLimit;
             this.targets = targets;
             logsInfo = new LogInfo[bufferLimit];
+            flushLogsThreadPool = new FlushLogsThreadPool(bufferLimit, targets);
         }
 
         public void Log(LogLevel level, string message)
@@ -28,16 +30,11 @@ namespace MPP_ConcurrentLogger
             Monitor.Enter(lockObj);
             try
             {
-                if (currentLogsCount < bufferLimit)
+                AddLog(new LogInfo(level, message));
+                if (currentLogsCount == bufferLimit)
                 {
-                    logsInfo[currentLogsCount] = new LogInfo(level, message);
-                    currentLogsCount++;
-                }
-                else
-                {
-                    Flush();
-                    ResetLogsCounter();
-                }
+                    FlushLogsAndResetLogCounter(logsInfo);
+                }                                         
             }  
             finally
             {
@@ -45,14 +42,24 @@ namespace MPP_ConcurrentLogger
             }          
         }
 
-        private void Flush()
+        private void AddLog(LogInfo logInfo)
         {
-            LogInfo[] tempLogsInfo = CopyLogInfo(logsInfo, currentLogsCount);            
-            for(int i = 0; i < targets.Length; i++)
-            {
-                targets[i].Flush(tempLogsInfo);
-            }            
+            logsInfo[currentLogsCount] = logInfo;
+            currentLogsCount++;
+        }        
+
+        private void FlushLogsAndResetLogCounter(LogInfo[] logsInfo)
+        {
+            FlushingThreadData flushingThreadData = new FlushingThreadData(logsInfo);
+            flushLogsThreadPool.AddThreadIdToPool(flushingThreadData.ThreadId);
+            ThreadPool.QueueUserWorkItem(FlushLogsToTargets, flushingThreadData);
+            ResetLogsCounter();
         }
+
+        private void FlushLogsToTargets(object flushingThreadData)
+        {
+            flushLogsThreadPool.Flush((FlushingThreadData)flushingThreadData);
+        }       
 
         private LogInfo[] CopyLogInfo(LogInfo[] source, int countToCopy)
         {
