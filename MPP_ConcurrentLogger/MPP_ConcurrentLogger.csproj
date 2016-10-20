@@ -52,7 +52,7 @@
     <Compile Include="Logger.cs" />
     <Compile Include="LogInfo.cs" />
     <Compile Include="LogInfoBase.cs" />
-    <Compile Include="LogThread.cs" />
+    <Compile Include="LogThreadPool.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
