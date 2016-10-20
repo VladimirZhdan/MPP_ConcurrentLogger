@@ -25,7 +25,7 @@ namespace MPP_ConcurrentLogger.Tests
             ILoggerTarget[] loggerTargets = new ILoggerTarget[1];
             loggerTargets[0] = new FileTarget(targetFileName);
             Logger logger = new Logger(2, loggerTargets);
-            LogThreadPool logThreadPool = new LogThreadPool(5, LogLevel.Info, logger);
+            LogThreadPool logThreadPool = new LogThreadPool(50, LogLevel.Info, logger);
             logThreadPool.FuncLog();
             Thread.Sleep(1000);
             
