@@ -16,6 +16,7 @@ namespace MPP_ConcurrentLogger.Tests
         public void Initialize()
         {
             targetFileName = "testFileTarget.txt";
+            ReCreateFile(targetFileName);
             fileTarget = new FileTarget(targetFileName);
         }
 
@@ -33,7 +34,7 @@ namespace MPP_ConcurrentLogger.Tests
 
             bool result = true;
             using (StreamReader reader = new StreamReader(targetFileName))
-            {
+            {                
                 int indexLog = 0;
                 while(!reader.EndOfStream && result)
                 {
@@ -51,5 +52,10 @@ namespace MPP_ConcurrentLogger.Tests
             Assert.AreEqual(expectedResult, result);
         }
 
+        private void ReCreateFile(string fileName)
+        {
+            FileStream fStream = File.Create(fileName);
+            fStream.Close();
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,25 +12,28 @@ namespace MPP_ConcurrentLogger
     {        
         static void Main(string[] args)
         {
+            string fileName = "data.txt";
+            ReCreateFile(fileName);
             ILoggerTarget[] loggerTarget = new ILoggerTarget[1];
-            loggerTarget[0] = new FileTarget("data.txt");
+            loggerTarget[0] = new FileTarget(fileName);
             Logger logger = new Logger(2, loggerTarget);
-            CreateAndStartThreads(50, 2, logger);            
+            RunAndWaitThreads(50, 2, logger);
+            Console.WriteLine("Press <Enter> to exit");         
             Console.ReadLine();
         }
 
-        private static void CreateAndStartThreads(int countThreads, int countMessage, ILogger logger)
+        private static void RunAndWaitThreads(int countThreads, int countMessage, ILogger logger)
         {
-            LogThreadPool logThreadPool = new LogThreadPool(countMessage, LogLevel.Info, logger);
-            Thread[] thread = new Thread[countThreads];
-            for(int i = 0; i < thread.Length; i++)
-            {
-                thread[i] = new Thread(logThreadPool.FuncLog);
-            } 
-            for(int i = 0; i < thread.Length; i++)
-            {
-                thread[i].Start();
-            }
+            LogThreadPool logThreadPool = new LogThreadPool(countThreads, countMessage, LogLevel.Info, logger);            
+            logThreadPool.StartThreads();
+            while (logThreadPool.IsThreadsRunning) ;
         }        
+
+        private static void ReCreateFile(string fileName)
+        {
+            FileStream fStream = File.Create(fileName);
+            fStream.Close();
+        }
+
     }
 }

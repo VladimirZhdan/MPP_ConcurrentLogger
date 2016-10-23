@@ -14,7 +14,7 @@ namespace MPP_ConcurrentLogger.Tests
         [TestInitialize]
         public void Initialize()
         {
-            targetFileName = "temp.txt";
+            targetFileName = "temp.txt";            
             ReCreateFile(targetFileName);
         }
          
@@ -25,23 +25,22 @@ namespace MPP_ConcurrentLogger.Tests
             ILoggerTarget[] loggerTargets = new ILoggerTarget[1];
             loggerTargets[0] = new FileTarget(targetFileName);
             Logger logger = new Logger(2, loggerTargets);
-            LogThreadPool logThreadPool = new LogThreadPool(50, LogLevel.Info, logger);
-            logThreadPool.FuncLog();
-            Thread.Sleep(1000);
+            CreateAndStartLogingThreads(50, 2, logger);                        
             
             bool result = true;
             using (StreamReader reader = new StreamReader(targetFileName))
-            {
-                int indexMessage = 0;
+            {                
+                DateTime prevDate = new DateTime();                                
+                DateTime currentDate;
                 while(!reader.EndOfStream && result)
                 {
-                    string actualStartTaskLine = reader.ReadLine();
-                    string expectedContainedStartTaskStr = logThreadPool.GetStartTaskMessage(indexMessage);
-                    result = (result && actualStartTaskLine.Contains(expectedContainedStartTaskStr));
-                    string actualEndTaskLine = reader.ReadLine();
-                    string expectedContainedEndTaskStr = logThreadPool.GetEndTaskMessage(indexMessage);
-                    result = (result && actualEndTaskLine.Contains(expectedContainedEndTaskStr));
-                    indexMessage++;
+                    string currentLogLine = reader.ReadLine();
+                    currentDate = Convert.ToDateTime(currentLogLine.Substring(1, currentLogLine.LastIndexOf(']') - 1));
+                    if(currentDate < prevDate)
+                    {
+                        result = false;
+                    }
+                    prevDate = currentDate;
                 }
             }
 
@@ -52,7 +51,16 @@ namespace MPP_ConcurrentLogger.Tests
 
         private void ReCreateFile(string fileName)
         {
-
+            FileStream fStream = File.Create(fileName);
+            fStream.Close();
         }
+
+        private void CreateAndStartLogingThreads(int countThreads, int countMessage, ILogger logger)
+        {
+            LogThreadPool logThreadPool = new LogThreadPool(countThreads, countMessage, LogLevel.Info, logger);
+            logThreadPool.StartThreads();
+            while (logThreadPool.IsThreadsRunning) ;    
+        }        
+        
     }
 }
