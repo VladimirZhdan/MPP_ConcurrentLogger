@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MPP_ConcurrentLogger;
-using System.Threading;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 
 namespace MPP_ConcurrentLogger.Tests
@@ -22,7 +19,7 @@ namespace MPP_ConcurrentLogger.Tests
 
 
         [TestMethod]
-        public void CheckRightFlushAllLogs()
+        public void CheckRightFlushAllLogsInFileTarget()
         {
             LogInfo[] logsInfo = new LogInfo[10];
             for(int i = 0; i < logsInfo.Length; i++)

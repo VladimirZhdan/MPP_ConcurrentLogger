@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
+﻿using System.Threading;
 
 namespace MPP_ConcurrentLogger
 {
@@ -94,5 +89,14 @@ namespace MPP_ConcurrentLogger
             }            
             return result;
         }
+
+        public static void RunAndWaitLogingThreads(int countThreads, int countMessage, ILogger logger)
+        {
+            LogThreadPool logThreadPool = new LogThreadPool(countThreads, countMessage, LogLevel.Info, logger);
+            logThreadPool.StartThreads();
+            Thread.Sleep(10000);
+            while (logThreadPool.IsThreadsRunning) ;
+        }
+
     }
 }

@@ -1,52 +1,46 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MPP_ConcurrentLogger;
-using System.Threading;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
+using System.Net;
 
 namespace MPP_ConcurrentLogger.Tests
 {
     [TestClass]
     public class LoggerTest
     {
+        private FileTarget fileTarget;
         private string targetFileName;
+        private UdpPortTarget udpPortTarget;
+        private int port;
 
         [TestInitialize]
         public void Initialize()
         {
-            targetFileName = "temp.txt";            
+            targetFileName = "loggerTest.txt";
             ReCreateFile(targetFileName);
+            fileTarget = new FileTarget(targetFileName);
+
+            port = 50000;
+            udpPortTarget = new UdpPortTarget(IPAddress.Parse("127.0.0.1"), port);
         }
-         
 
         [TestMethod]
         public void CheckFlushOrderByThreads()
-        {                        
-            ILoggerTarget[] loggerTargets = new ILoggerTarget[1];
-            loggerTargets[0] = new FileTarget(targetFileName);
-            Logger logger = new Logger(2, loggerTargets);
-            CreateAndStartLogingThreads(50, 2, logger);                        
+        {
+            ILoggerTarget[] loggerTarget = new ILoggerTarget[2];
+            loggerTarget[0] = fileTarget;
+            loggerTarget[1] = udpPortTarget;
+
+            Logger logger = new Logger(2, loggerTarget);
+
+            ListenerLogsFromUdpPort listener = new ListenerLogsFromUdpPort(port);
+            listener.StartListen();
             
-            bool result = true;
-            using (StreamReader reader = new StreamReader(targetFileName))
-            {                
-                DateTime prevDate = new DateTime();                                
-                DateTime currentDate;
-                while(!reader.EndOfStream && result)
-                {
-                    string currentLogLine = reader.ReadLine();
-                    currentDate = Convert.ToDateTime(currentLogLine.Substring(1, currentLogLine.LastIndexOf(']') - 1));
-                    if(currentDate < prevDate)
-                    {
-                        result = false;
-                    }
-                    prevDate = currentDate;
-                }
-            }
+            LogThreadPool.RunAndWaitLogingThreads(50, 2, logger);
 
-            bool expectedResult = true;
+            LoggerWithFileTargetTest.TestMethod(targetFileName);
 
-            Assert.AreEqual(expectedResult, result);
+            listener.StopListen();
+            while (listener.IsRunningListenerThread) ;
         }
 
         private void ReCreateFile(string fileName)
@@ -55,12 +49,5 @@ namespace MPP_ConcurrentLogger.Tests
             fStream.Close();
         }
 
-        private void CreateAndStartLogingThreads(int countThreads, int countMessage, ILogger logger)
-        {
-            LogThreadPool logThreadPool = new LogThreadPool(countThreads, countMessage, LogLevel.Info, logger);
-            logThreadPool.StartThreads();
-            while (logThreadPool.IsThreadsRunning) ;    
-        }        
-        
     }
 }

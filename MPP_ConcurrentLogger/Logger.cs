@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
+﻿using System.Threading;
 
 namespace MPP_ConcurrentLogger
 {
@@ -52,7 +47,7 @@ namespace MPP_ConcurrentLogger
         {
             FlushingThreadData flushingThreadData = new FlushingThreadData(logsInfo);
             flushLogsThreadPool.AddThreadIdToPool(flushingThreadData.ThreadId);
-            ThreadPool.QueueUserWorkItem(FlushLogsToTargets, flushingThreadData);
+            ThreadPool.QueueUserWorkItem(FlushLogsToTargets, flushingThreadData);            
             ResetLogsCounter();
         }
 

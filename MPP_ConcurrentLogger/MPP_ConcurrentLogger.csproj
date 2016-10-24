@@ -43,16 +43,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ByteConverter.cs" />
     <Compile Include="FileTarget.cs" />
     <Compile Include="FlushingThreadData.cs" />
     <Compile Include="FlushLogsThreadPool.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="ILoggerTarget.cs" />
     <Compile Include="ILogInfo.cs" />
+    <Compile Include="IObjectConverter.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="LogInfo.cs" />
     <Compile Include="LogInfoBase.cs" />
     <Compile Include="LogThreadPool.cs" />
+    <Compile Include="ObjectConverter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UdpPortTarget.cs" />

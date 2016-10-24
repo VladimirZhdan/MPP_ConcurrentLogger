@@ -1,19 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
+using System.Net;
 
 namespace MPP_ConcurrentLogger
 {
-    class UdpPortTarget
+    public class UdpPortTarget : ILoggerTarget
     {
-        private UdpClient client;
+        private UdpClient sender;
+        private IPEndPoint descPoint;
 
-        public UdpPortTarget(int sourcePort, int descPort)
+        public UdpPortTarget(IPAddress ipAddress, int descPort)
         {
-            //client = new UdpClient(soucePort);
+            descPoint = new IPEndPoint(ipAddress, descPort);
+            sender = new UdpClient();            
+        }
+
+        public bool Flush(LogInfo[] logsInfo)
+        {
+            try
+            {
+                byte[] bytesLogsInfo = ObjectConverter<LogInfo[]>.ByteConverter.ObjectToBytes(logsInfo);
+                sender.Connect(descPoint);                                 
+                sender.Send(bytesLogsInfo, bytesLogsInfo.Length);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }                            
+            return true;            
+        }
+
+        public Task<bool> FlushAsync(LogInfo[] logsInfo)
+        {
+            return Task.Run(() =>
+            {
+                return Flush(logsInfo);
+            });
         }
     }
 }
