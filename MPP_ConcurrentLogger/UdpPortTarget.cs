@@ -30,13 +30,26 @@ namespace MPP_ConcurrentLogger
             }                            
             return true;            
         }
-
-        public Task<bool> FlushAsync(LogInfo[] logsInfo)
+        
+        public async Task<bool> FlushAsync(LogInfo[] logsInfo)
         {
-            return Task.Run(() =>
+            try
             {
-                return Flush(logsInfo);
-            });
+                byte[] bytesLogsInfo = ObjectConverter<LogInfo[]>.ByteConverter.ObjectToBytes(logsInfo);
+                sender.Connect(descPoint);                                
+                await sender.SendAsync(bytesLogsInfo, bytesLogsInfo.Length);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            return true;
+
+
+            //return Task.Run(() =>
+            //{
+            //    return Flush(logsInfo);
+            //});
         }
     }
 }

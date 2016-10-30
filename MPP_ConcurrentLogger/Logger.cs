@@ -12,6 +12,14 @@ namespace MPP_ConcurrentLogger
         private LogInfo[] logsInfo;
         private FlushLogsThreadPool flushLogsThreadPool;
 
+        public bool IsFlushLogThreadPoolClear
+        {
+            get
+            {
+                return flushLogsThreadPool.IsFlushingComplete;
+            }
+        }
+
         public Logger(int bufferLimit, ILoggerTarget[] targets)
         {
             this.bufferLimit = bufferLimit;

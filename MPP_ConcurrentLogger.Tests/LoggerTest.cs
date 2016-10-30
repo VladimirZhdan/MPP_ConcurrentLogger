@@ -35,7 +35,8 @@ namespace MPP_ConcurrentLogger.Tests
             ListenerLogsFromUdpPort listener = new ListenerLogsFromUdpPort(port);
             listener.StartListen();
             
-            LogThreadPool.RunAndWaitLogingThreads(50, 2, logger);
+            LogThreadPool.RunAndWaitLogingThreads(10, 2, logger);
+            while (!logger.IsFlushLogThreadPoolClear) ;
 
             LoggerWithFileTargetTest.TestMethod(targetFileName);
 

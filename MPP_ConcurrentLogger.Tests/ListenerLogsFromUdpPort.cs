@@ -10,6 +10,7 @@ namespace MPP_ConcurrentLogger.Tests
     {        
         private UdpClient receiver;
         private Thread listenerThread;
+        private static int countLogs = 0;
 
         private volatile bool isStopThread;
 
@@ -25,7 +26,7 @@ namespace MPP_ConcurrentLogger.Tests
         public ListenerLogsFromUdpPort(int listeningPort)
         {
             receiver = new UdpClient(listeningPort);
-            receiver.Client.ReceiveTimeout = 3000;
+            receiver.Client.ReceiveTimeout = 300;
             Initialization();
         }
 
@@ -61,14 +62,20 @@ namespace MPP_ConcurrentLogger.Tests
                     DateTime currentLogTime = logsInfo[0].Time;
                     bool expectedResult = true;
                     bool actualResult = (prevLogTime <= currentLogTime);
-                    Assert.AreEqual(expectedResult, actualResult);                    
+                    Assert.AreEqual(expectedResult, actualResult);
+
+                    countLogs++;              
                 }
                 catch(SocketException e)
                 {
                     if(e.ErrorCode == (int)SocketError.TimedOut)
                     {
-                        isStopThread = true;
+                        continue;                        
                     }                    
+                }
+                catch(Exception ex)
+                {
+                    return;
                 }
                 
             }

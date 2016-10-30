@@ -43,8 +43,7 @@ namespace MPP_ConcurrentLogger
             for (int i = 0; i < countMessage; i++)
             {
                 string startMessage = GetStartTaskMessage(i);
-                logger.Log(level, startMessage);
-                Thread.Sleep(1000);
+                logger.Log(level, startMessage);                
                 string endMessage = GetEndTaskMessage(i);
                 logger.Log(level, endMessage);
             }
@@ -94,8 +93,8 @@ namespace MPP_ConcurrentLogger
         {
             LogThreadPool logThreadPool = new LogThreadPool(countThreads, countMessage, LogLevel.Info, logger);
             logThreadPool.StartThreads();
-            Thread.Sleep(10000);
-            while (logThreadPool.IsThreadsRunning) ;
+            Thread.Sleep(3000);
+            while (logThreadPool.IsThreadsRunning) ;                        
         }
 
     }

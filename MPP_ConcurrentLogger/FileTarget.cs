@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 
 namespace MPP_ConcurrentLogger
-{
+{   
     public class FileTarget : ILoggerTarget
     {
         private string fileName;
@@ -17,20 +17,23 @@ namespace MPP_ConcurrentLogger
             using (StreamWriter streamWriter = new StreamWriter(fileName, true))
             {
                 for(int i = 0; i < logsInfo.Length; i++)
-                {
+                {                    
                     streamWriter.WriteLine(logsInfo[i]);
                 }                
             }
             return true;
-        }
-        
-        public Task<bool> FlushAsync(LogInfo[] logsInfo)
-        {            
-            return Task.Run(() =>
-            {
-                return Flush(logsInfo);
-            });
+        }                
 
+        public async Task<bool> FlushAsync(LogInfo[] logsInfo)
+        {                        
+            using (StreamWriter streamWriter = File.AppendText(fileName))
+            {
+                for (int i = 0; i < logsInfo.Length; i++)
+                {
+                    await streamWriter.WriteLineAsync(logsInfo[i].ToString());
+                }
+            }
+            return true;
         }
     }
 }

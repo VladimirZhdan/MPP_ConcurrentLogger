@@ -42,7 +42,7 @@ namespace MPP_ConcurrentLogger
 
         public override string ToString()
         {
-            return String.Format("[{0}] {1} {2}.", time, level, message);
+            return String.Format("[{0}:{1}] {2} {3}.", time, time.Millisecond, level, message);
         }
     }
 }
